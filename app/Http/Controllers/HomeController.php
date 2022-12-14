@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Application;
+
+class HomeController extends Controller
+{
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function index()
+    {
+        if(Auth::check()){
+            if(Auth::user()->status === 'Admin'){
+                return redirect()->route('admin');
+            }
+            else{
+                $context = ['applications' => Application::latest()->where('user_id', Auth::user()->id)->get()];
+                return view('home', $context); 
+            }
+        } 
+        else{
+            return redirect()->route('login');
+        } 
+    }
+}
